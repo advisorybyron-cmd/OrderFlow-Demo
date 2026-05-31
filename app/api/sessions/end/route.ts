@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode } from '@/lib/demo'
 
 export async function POST(request: Request) {
@@ -24,6 +23,7 @@ export async function POST(request: Request) {
       })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Get total items for this session

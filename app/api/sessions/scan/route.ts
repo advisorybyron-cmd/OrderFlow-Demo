@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { isDemoMode } from '@/lib/demo'
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +12,25 @@ export async function POST(request: Request) {
       )
     }
 
+    // Demo mode: return fake scan result
+    if (isDemoMode) {
+      return NextResponse.json({
+        scan: {
+          id: `demo-scan-${Date.now()}`,
+          work_session_id: sessionId,
+          employee_id: employeeId,
+          order_number: orderNumber,
+          item_index: itemIndex,
+          item_name: itemName || null,
+          item_sku: itemSku || null,
+          quantity: quantity || 1,
+          scanned_at: new Date().toISOString(),
+        },
+        totalItems: itemIndex + 1,
+      })
+    }
+
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Record the item scan
