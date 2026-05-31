@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getOrderByNumber } from '@/lib/shipstation'
 import { isDemoMode, getDemoOrderByNumber } from '@/lib/demo'
 
 export async function GET(
@@ -18,6 +17,7 @@ export async function GET(
       return NextResponse.json({ order: demoOrder })
     }
 
+    const { getOrderByNumber } = await import('@/lib/shipstation')
     const order = await getOrderByNumber(orderNumber)
 
     if (!order) {

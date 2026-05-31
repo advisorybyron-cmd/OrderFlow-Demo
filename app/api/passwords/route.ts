@@ -1,9 +1,15 @@
-import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { isDemoMode } from '@/lib/demo'
 
 // GET - List all page passwords (without revealing actual passwords)
 export async function GET() {
   try {
+    // Demo mode: return empty list
+    if (isDemoMode) {
+      return NextResponse.json({ pages: [] })
+    }
+
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     const { data, error } = await supabase
@@ -26,6 +32,11 @@ export async function GET() {
 // POST - Update a page password
 export async function POST(request: Request) {
   try {
+    // Demo mode: don't allow password changes
+    if (isDemoMode) {
+      return NextResponse.json({ error: 'Cannot change passwords in demo mode' }, { status: 403 })
+    }
+
     const { pageKey, newPassword } = await request.json()
 
     if (!pageKey || !newPassword) {
@@ -36,6 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Password must be at least 4 characters' }, { status: 400 })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     const { error } = await supabase

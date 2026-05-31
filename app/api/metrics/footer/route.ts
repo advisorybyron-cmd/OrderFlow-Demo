@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { searchOrders } from '@/lib/shipstation'
 import type { ShipStationOrder } from '@/lib/shipstation/types'
 import { isDemoMode } from '@/lib/demo'
 
@@ -19,6 +18,7 @@ export async function GET() {
       })
     }
 
+    const { searchOrders } = await import('@/lib/shipstation')
     const now = new Date()
 
     // Fetch first page to get total count and pages

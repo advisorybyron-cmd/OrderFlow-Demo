@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { listShipments } from '@/lib/shipstation'
 import { format, startOfDay, subDays, startOfMonth, subMonths } from 'date-fns'
 import { isDemoMode, getDemoShipments } from '@/lib/demo'
 
@@ -164,7 +163,7 @@ export async function GET(request: Request) {
       })
     }
 
-
+    const { listShipments } = await import('@/lib/shipstation')
 
     const allShipments: Array<{
       orderNumber: string

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { isDemoMode } from '@/lib/demo'
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +12,12 @@ export async function POST(request: Request) {
       )
     }
 
+    // Demo mode: always return valid
+    if (isDemoMode) {
+      return NextResponse.json({ valid: true })
+    }
+
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Check if this session still exists and is active (not ended)
