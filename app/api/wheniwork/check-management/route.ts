@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getActiveUsers, getPositions } from '@/lib/wheniwork'
 import { isDemoMode, getDemoEmployeeByCode } from '@/lib/demo'
 
 export async function GET(request: Request) {
@@ -14,10 +13,13 @@ export async function GET(request: Request) {
     // Demo mode: check if employee has management access based on demo data
     if (isDemoMode) {
       const demoEmployee = getDemoEmployeeByCode(employeeCode)
-      // AM007 (Alex Martinez) is the management demo employee
-      const hasManagementAccess = demoEmployee?.employee_code === 'AM007'
+      // TB005 (Tom Brown) has management access in demo
+      const hasManagementAccess = demoEmployee?.room_access?.includes('management') || false
       return NextResponse.json({ hasManagementAccess })
     }
+
+    // Only import WheniWork when not in demo mode
+    const { getActiveUsers, getPositions } = await import('@/lib/wheniwork')
 
     // Get all positions to find the Management position ID
     const positions = await getPositions()

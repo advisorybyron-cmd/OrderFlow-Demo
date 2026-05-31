@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getTimes, getPositions, getActiveUsers } from '@/lib/wheniwork'
 import { isDemoMode, getDemoClockStatus } from '@/lib/demo'
 
 export async function GET(request: Request) {
@@ -7,7 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const employeeCode = searchParams.get('employeeCode')
 
-    console.log('[v0] current-position API called with employeeCode:', employeeCode)
+    console.log('[v0] current-position API called with employeeCode:', employeeCode, 'isDemoMode:', isDemoMode)
 
     if (!employeeCode) {
       return NextResponse.json(
@@ -19,6 +18,7 @@ export async function GET(request: Request) {
     // Demo mode: return fake clock status
     if (isDemoMode) {
       const clockStatus = getDemoClockStatus(employeeCode)
+      console.log('[v0] Demo clock status:', clockStatus)
       if (!clockStatus) {
         return NextResponse.json({ position: null })
       }
@@ -30,6 +30,9 @@ export async function GET(request: Request) {
         },
       })
     }
+
+    // Only import WheniWork when not in demo mode
+    const { getTimes, getPositions, getActiveUsers } = await import('@/lib/wheniwork')
 
     // Get all users to find the one with this employee code
     const users = await getActiveUsers()

@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode, getDemoEmployeeByCode, createDemoSession } from '@/lib/demo'
 
 export async function POST(request: Request) {
   try {
     const { employeeCode } = await request.json()
+
+    console.log('[v0] Login attempt:', { employeeCode, isDemoMode })
 
     if (!employeeCode) {
       return NextResponse.json(
@@ -16,6 +17,8 @@ export async function POST(request: Request) {
     // Demo mode: use fake employee data
     if (isDemoMode) {
       const demoEmployee = getDemoEmployeeByCode(employeeCode)
+      console.log('[v0] Demo employee lookup:', { employeeCode, found: !!demoEmployee })
+      
       if (!demoEmployee) {
         return NextResponse.json(
           { error: 'Employee not found. Try: JD001, SS002, MJ003, EW004, TB005, LD006, AM007, or RG008' },
@@ -38,6 +41,8 @@ export async function POST(request: Request) {
       })
     }
 
+    // Only import Supabase when not in demo mode
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Find employee by code
