@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getActiveUsers, getTimes, getPositions, clockOut, clockIn } from '@/lib/wheniwork'
 import { createClient } from '@/lib/supabase/server'
+import { isDemoMode, setDemoClockIn, getDemoClockStatus } from '@/lib/demo'
 
 export async function POST(request: Request) {
   try {
@@ -11,6 +12,21 @@ export async function POST(request: Request) {
         { error: 'Employee code and new position name are required' },
         { status: 400 }
       )
+    }
+
+    // Demo mode: fake position switch
+    if (isDemoMode) {
+      const previousStatus = getDemoClockStatus(employeeCode)
+      setDemoClockIn(employeeCode, newPositionName)
+      return NextResponse.json({
+        success: true,
+        message: `Successfully switched to ${newPositionName}`,
+        newPosition: {
+          id: 99999,
+          name: newPositionName,
+        },
+        previousPosition: previousStatus?.position || null,
+      })
     }
 
     // Get the user from WheniWork
