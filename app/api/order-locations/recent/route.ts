@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode, getDemoActivities } from '@/lib/demo'
 
 export async function GET(request: Request) {
@@ -25,6 +24,7 @@ export async function GET(request: Request) {
       })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Get the most recent order location scans, joining employee data

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode, addDemoActivity, getDemoActivities, getDemoEmployeeById } from '@/lib/demo'
 
 export async function POST(request: Request) {
@@ -33,6 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, data: activity })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Insert into order_locations (for this app)
@@ -106,6 +106,7 @@ export async function GET(request: Request) {
       })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     // Get the most recent location for this order

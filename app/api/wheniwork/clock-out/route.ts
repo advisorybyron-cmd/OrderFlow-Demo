@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getActiveUsers, getTimes, getPositions, clockOut } from '@/lib/wheniwork'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode, setDemoClockOut, getDemoClockStatus } from '@/lib/demo'
 
 export async function POST(request: Request) {
@@ -24,6 +22,10 @@ export async function POST(request: Request) {
         previousPosition: previousStatus?.position || null,
       })
     }
+
+    // Only import when not in demo mode
+    const { getActiveUsers, getTimes, getPositions, clockOut } = await import('@/lib/wheniwork')
+    const { createClient } = await import('@/lib/supabase/server')
 
     // Get the user from WheniWork
     const users = await getActiveUsers()

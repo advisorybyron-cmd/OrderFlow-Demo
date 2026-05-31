@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { isDemoMode, DEMO_EMPLOYEES } from '@/lib/demo'
 
 export async function GET() {
@@ -17,6 +16,7 @@ export async function GET() {
       return NextResponse.json({ employees: normalized })
     }
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     const { data: employees, error } = await supabase
@@ -45,6 +45,11 @@ export async function GET() {
 // Create employee (for initial setup or When I Work sync)
 export async function POST(request: Request) {
   try {
+    // Demo mode: don't allow creating employees
+    if (isDemoMode) {
+      return NextResponse.json({ error: 'Cannot create employees in demo mode' }, { status: 403 })
+    }
+
     const body = await request.json()
     const { employeeCode, firstName, lastName, name, avatarUrl, wiwUserId } = body
 
@@ -59,6 +64,7 @@ export async function POST(request: Request) {
     const first = firstName || name?.split(' ')[0] || ''
     const last = lastName || name?.split(' ').slice(1).join(' ') || ''
 
+    const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
 
     const { data: employee, error } = await supabase
